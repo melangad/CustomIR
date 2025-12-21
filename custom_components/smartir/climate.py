@@ -37,8 +37,7 @@ SUPPORT_FLAGS = (
     ClimateEntityFeature.TURN_OFF |
     ClimateEntityFeature.TURN_ON |
     ClimateEntityFeature.TARGET_TEMPERATURE | 
-    ClimateEntityFeature.FAN_MODE |
-    ClimateEntityFeature.PRESET_MODE
+    ClimateEntityFeature.FAN_MODE
 )
 
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend({
@@ -147,6 +146,10 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
             self._support_flags = self._support_flags | ClimateEntityFeature.SWING_MODE
             self._current_swing_mode = self._swing_modes[0]
             self._support_swing = True
+        
+        if self._presest_modes:
+            self._support_flags = self._support_flags | ClimateEntityFeature.PRESET_MODE
+            self._current_preset_mode = self._presest_modes[0]
 
         self._temp_lock = asyncio.Lock()
         self._on_by_remote = False
@@ -396,7 +399,7 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
                     await self._controller.send(self._commands['on'])
                     await asyncio.sleep(self._delay)
 
-                if preset_mode == 'none':
+                if preset_mode == None or preset_mode == 'none':
 
                     if self._support_swing == True:
                         command_to_send = self._commands[operation_mode][fan_mode][swing_mode][target_temperature]
