@@ -19,7 +19,7 @@ from homeassistant.helpers.typing import ConfigType
 _LOGGER = logging.getLogger(__name__)
 
 DOMAIN = 'customir'
-VERSION = '1.0.0'
+VERSION = '1.0.1'
 MANIFEST_URL = (
     "https://raw.githubusercontent.com/"
     "melangad/CustomIR/{}/"
