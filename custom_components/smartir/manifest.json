@@ -8,7 +8,7 @@
   "homeassistant": "2025.5.0",
   "version": "1.18.2",
   "updater": {
-    "version": "1.18.",
+    "version": "1.18.2",
     "releaseNotes": "-- Code improvemnts and bug fixes.",
     "files": [
       "__init__.py",
