@@ -123,7 +123,7 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
         self._operation_modes = [HVACMode.OFF] + valid_hvac_modes
         self._fan_modes = device_data['fanModes']
         self._swing_modes = device_data.get('swingModes')
-        self._presest_modes = device_data.get('presetModes')
+        self._preset_modes = device_data.get('presetModes')
         self._commands = device_data['commands']
 
         self._target_temperature = self._min_temperature
@@ -147,9 +147,9 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
             self._current_swing_mode = self._swing_modes[0]
             self._support_swing = True
         
-        if self._presest_modes:
+        if self._preset_modes:
             self._support_flags = self._support_flags | ClimateEntityFeature.PRESET_MODE
-            self._current_preset_mode = self._presest_modes[0]
+            self._current_preset_mode = self._preset_modes[0]
 
         self._temp_lock = asyncio.Lock()
         self._on_by_remote = False
@@ -277,7 +277,7 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
     
     @property
     def preset_modes(self):
-        return self._presest_modes
+        return self._preset_modes
     
     @property
     def preset_mode(self):
@@ -399,14 +399,14 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
                     await self._controller.send(self._commands['on'])
                     await asyncio.sleep(self._delay)
 
-                if preset_mode == None or preset_mode == 'none':
+                if preset_mode is None or preset_mode == 'none':
 
-                    if self._support_swing == True:
+                    if self._support_swing:
                         command_to_send = self._commands[operation_mode][fan_mode][swing_mode][target_temperature]
                     else:
                         command_to_send = self._commands[operation_mode][fan_mode][target_temperature]
                 else:
-                    if self._support_swing == True:
+                    if self._support_swing:
                         command_to_send = self._commands['preset'][operation_mode][preset_mode][swing_mode][target_temperature]
                     else:
                         command_to_send = self._commands['preset'][operation_mode][preset_mode][target_temperature]
@@ -453,7 +453,7 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
 
         if new_state.state == STATE_ON and self._hvac_mode == HVACMode.OFF:
             self._on_by_remote = True
-            if self._power_sensor_restore_state == True and self._last_on_operation is not None:
+            if self._power_sensor_restore_state and self._last_on_operation is not None:
                 self._hvac_mode = self._last_on_operation
             else:
                 self._hvac_mode = STATE_ON
