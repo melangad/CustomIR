@@ -1,32 +1,57 @@
 <p align="center">
-  <a href="#"><img src="assets/smartir_climate.png" width="350" alt="SmartIR Climate"></a>
+  <a href="#"><img src="assets/customir_climate.png" width="350" alt="CustomIR Climate"></a>
 </p>
 
-For this platform to work, we need a .json file containing all the necessary IR commands.
-Find your device's brand code [here](CLIMATE.md#available-codes-for-climate-devices) and add the number in the `device_code` field. If your device is not working, you will need to learn your own codes and place the Json file in `smartir/codes/climate` subfolders. ~~[Keite Trần](https://github.com/keitetran/BroadlinkIRTools) developed [an amazing web-based app](https://keitetran.github.io/BroadlinkIRTools/) for this job.~~
-_Please note that the device_code field only accepts positive numbers. The .json extension is not required._
+# CustomIR Climate Component
 
-## Configuration variables:
-| Name | Type | Default | Description |
-| ---- | :--: | :-----: | ----------- |
-| `name` | string | optional | The name of the device |
-| `unique_id` | string | optional | An ID that uniquely identifies this device. If two devices have the same unique ID, Home Assistant will raise an exception. |
-| `device_code` | number | required | (Accepts only positive numbers) |
-| `controller_data` | string | required | The data required for the controller to function. Enter the entity_id of the Broadlink remote **(must be an already configured device)**, or the entity id of the Xiaomi IR controller, or the MQTT topic on which to send commands. |
-| `delay` | number | optional | Adjusts the delay in seconds between multiple commands. The default is 0.5 |
-| `temperature_sensor` | string | optional | *entity_id* for a temperature sensor |
-| `humidity_sensor` | string | optional | *entity_id* for a humidity sensor |
-| `power_sensor` | string | optional | *entity_id* for a sensor that monitors whether your device is actually `on` or `off`. This may be a power monitor sensor. (Accepts only on/off states) |
-| `power_sensor_restore_state` | boolean | optional | If `power_sensor` is set, and the device is likely to turn off and back on while still in the set mode (for instance, a minisplit cycling on and off while in heating or cooling mode), setting this to `true` will cause the climate state to update dynamically, following the state of the `power_sensor`. |
+The CustomIR Climate platform allows you to control IR-based air conditioners using various IR controllers (Broadlink, Xiaomi, ESPHome, LOOKin, MQTT).
 
-## Example (using broadlink controller):
-Add a Broadlink RM device named "Bedroom" via config flow (read the [docs](https://www.home-assistant.io/integrations/broadlink/)).
+## Features
+
+- **Multiple Controller Support**: Works with Broadlink, Xiaomi, ESPHome, LOOKin, and MQTT controllers
+- **Temperature Control**: Set target temperature with configurable precision (0.5°C or 1°C steps)
+- **Operation Modes**: Support for heat, cool, auto, dry, and fan-only modes (device-dependent)
+- **Fan Speed Control**: Multiple fan speeds including auto, low, mid, high, and quiet modes
+- **Swing Control**: Vertical and/or horizontal swing support for compatible devices
+- **Preset Modes**: Support multiple presets modes
+- **Sensor Integration**: Display current temperature and humidity from external sensors
+- **Power Monitoring**: Track actual device power state with binary sensors
+- **State Restoration**: Automatically restore previous settings when device powers on
+
+## Quick Start
+
+1. Find your device's brand code in the [Available Codes](#available-codes-for-climate-devices) section below
+2. Add the device code number to your configuration (no file extension needed)
+3. Configure your IR controller entity
+4. Optionally add temperature and humidity sensors for better control
+
+**Note:** If your device is not listed or doesn't work with existing codes, you'll need to create a custom JSON file with your device's IR commands and place it in `custom_components/customir/codes/climate/`. The `device_code` field only accepts positive numbers.
+
+## Configuration Variables
+
+| Name | Type | Required | Default | Description |
+| ---- | :--: | :------: | :-----: | ----------- |
+| `name` | string | No | CustomIR Climate | The name of the climate device |
+| `unique_id` | string | No | - | A unique identifier for this device. Must be unique across all devices in Home Assistant |
+| `device_code` | number | **Yes** | - | The device code from the [Available Codes](#available-codes-for-climate-devices) section (positive numbers only, no file extension) |
+| `controller_data` | string | **Yes** | - | Controller configuration:<br>• **Broadlink**: entity_id of the remote (e.g., `remote.bedroom_remote`)<br>• **Xiaomi**: entity_id of the Xiaomi IR controller<br>• **MQTT**: topic for sending commands<br>• **LOOKin**: IP address of the device<br>• **ESPHome**: service name (e.g., `my_espir_send_raw_command`) |
+| `delay` | number | No | 0.5 | Delay in seconds between multiple IR commands |
+| `temperature_sensor` | string | No | - | Entity ID of a temperature sensor to display current temperature |
+| `humidity_sensor` | string | No | - | Entity ID of a humidity sensor to display current humidity |
+| `power_sensor` | string | No | - | Entity ID of a binary sensor that monitors actual device power state (on/off only) |
+| `power_sensor_restore_state` | boolean | No | false | When `true`, the climate entity will restore its previous operation mode when the power sensor turns on (useful for devices that cycle on/off automatically) |
+
+## Configuration Examples
+
+### Broadlink Controller
+
+First, add your Broadlink RM device via the Home Assistant Broadlink integration (Configuration → Integrations → Add Integration → Broadlink).
 
 ```yaml
-smartir:
+customir:
 
 climate:
-  - platform: smartir
+  - platform: customir
     name: Office AC
     unique_id: office_ac
     device_code: 1000
@@ -36,9 +61,10 @@ climate:
     power_sensor: binary_sensor.ac_power
 ```
 
-## Example (using xiaomi controller):
+### Xiaomi IR Controller
+
 ```yaml
-smartir:
+customir:
 
 remote:
   - platform: xiaomi_miio
@@ -46,7 +72,7 @@ remote:
     token: YOUR_TOKEN
 
 climate:
-  - platform: smartir
+  - platform: customir
     name: Office AC
     unique_id: office_ac
     device_code: 2000
@@ -56,12 +82,13 @@ climate:
     power_sensor: binary_sensor.ac_power
 ```
 
-## Example (using mqtt controller):
+### MQTT Controller
+
 ```yaml
-smartir:
+customir:
 
 climate:
-  - platform: smartir
+  - platform: customir
     name: Office AC
     unique_id: office_ac
     device_code: 3000
@@ -72,12 +99,13 @@ climate:
     power_sensor_restore_state: true
 ```
 
-## Example (using LOOKin controller):
+### LOOKin Controller
+
 ```yaml
-smartir:
+customir:
 
 climate:
-  - platform: smartir
+  - platform: customir
     name: Office AC
     unique_id: office_ac
     device_code: 4000
@@ -87,8 +115,9 @@ climate:
     power_sensor: binary_sensor.ac_power
 ```
 
-## Example (using ESPHome):
-ESPHome configuration example:
+### ESPHome Controller
+
+**ESPHome Device Configuration:**
 ```yaml
 esphome:
   name: my_espir
@@ -108,12 +137,13 @@ remote_transmitter:
   pin: GPIO14
   carrier_duty_percent: 50%
 ```
-HA configuration.yaml:
+
+**Home Assistant Configuration:**
 ```yaml
-smartir:
+customir:
 
 climate:
-  - platform: smartir
+  - platform: customir
     name: Office AC
     unique_id: office_ac
     device_code: 8000
@@ -123,9 +153,47 @@ climate:
     power_sensor: binary_sensor.ac_power
 ```
 
-## Available codes for climate devices:
-The following are the code files created by the amazing people in the community. Before you start creating your own code file, try if one of them works for your device. **Please open an issue if your device is working and not included in the supported models.**
-Contributing to your own code files is welcome. However, we do not accept incomplete files as well as files related to MQTT controllers.
+## Troubleshooting
+
+### Device Not Responding
+1. Verify your IR controller is properly configured and working
+2. Check that the `controller_data` matches your controller's entity ID or configuration
+3. Ensure the IR transmitter has line-of-sight to the AC unit
+4. Try increasing the `delay` parameter if commands are being sent too quickly
+
+### Wrong Temperature or Mode
+1. Verify you're using the correct `device_code` for your AC model
+2. Check if your device requires a different code from the same manufacturer
+3. Some devices have multiple remotes - try codes for different remote models
+
+### Power Sensor Issues
+1. Ensure your power sensor reports only `on` or `off` states
+2. If your AC cycles on/off automatically, set `power_sensor_restore_state: true`
+3. The power sensor should monitor actual device power, not just the climate entity state
+
+### Creating Custom Device Codes
+If no existing code works for your device, you'll need to:
+1. Learn the IR commands from your remote control
+2. Create a JSON file following the structure in existing code files
+3. Include all operation modes, fan speeds, and temperature settings
+4. Place the file in `custom_components/customir/codes/climate/` with a unique number
+
+## Available Codes for Climate Devices
+
+The following device codes have been contributed by the community. Before creating your own code file, check if one of these works for your device.
+
+**Contributing:** We welcome contributions of new device codes! However, we do not accept:
+- Incomplete code files (missing operation modes, fan modes, or temperature ranges)
+- MQTT controller-specific files (use Broadlink, Xiaomi, ESPHome, or LOOKin instead)
+
+**If your device works but isn't listed:** Please open an issue to have it added to the supported models list.
+
+**Legend:**
+- **Code**: The device code number to use in your configuration
+- **Supported Models**: Specific AC models that work with this code
+- **Controller**: Compatible IR controller type(s)
+
+---
 
 #### Toyotomi
 | Code                               | Supported Models      | Controller |
