@@ -1,11 +1,3 @@
-[![](https://img.shields.io/github/v/release/smartHomeHub/CustomIR.svg?style=flat-square)](https://github.com/smartHomeHub/CustomIR/releases/latest) [![](https://img.shields.io/badge/HACS-Custom-orange.svg?style=flat-square)](https://github.com/custom-components/hacs)
-
-> ### ⚠️ Warning  
-> You are free to fork, modify, and use the code in this repository in accordance with the applicable open-source license.  
->  
-> **However, the name "CustomIR" must not be used in any capacity**, especially for promoting, rebranding, or distributing your own fork or derivative works.  
->  
-> Please respect this guideline to preserve the original project's identity.
 
 ## Overview
 CustomIR is a custom integration for controlling **climate devices**, **media players**, **fans** and **lights** via infrared controllers.<br>
