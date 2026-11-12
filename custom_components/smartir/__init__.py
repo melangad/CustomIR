@@ -2,17 +2,17 @@ import aiofiles
 import aiohttp
 import asyncio
 import binascii
-from distutils.version import StrictVersion
+from packaging.version import Version
 import json
 import logging
 import os.path
-import requests
 import struct
 import voluptuous as vol
 
 from aiohttp import ClientSession
 from homeassistant.const import (
     ATTR_FRIENDLY_NAME, __version__ as current_ha_version)
+from homeassistant.components.persistent_notification import async_create as pn_create
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.typing import ConfigType
 
@@ -77,21 +77,21 @@ async def _update(hass, branch, do_update=False, notify_if_latest=True):
                     last_version = data['updater']['version']
                     release_notes = data['updater']['releaseNotes']
 
-                    if StrictVersion(last_version) <= StrictVersion(VERSION):
+                    if Version(last_version) <= Version(VERSION):
                         if notify_if_latest:
-                            hass.components.persistent_notification.async_create(
+                            pn_create(hass,
                                 "You're already using the latest version!", 
                                 title='CustomIR')
                         return
 
-                    if StrictVersion(current_ha_version) < StrictVersion(min_ha_version):
-                        hass.components.persistent_notification.async_create(
+                    if Version(current_ha_version) < Version(min_ha_version):
+                        pn_create(hass,
                             "There is a new version of CustomIR integration, but it is **incompatible** "
                             "with your system. Please first update Home Assistant.", title='CustomIR')
                         return
 
                     if do_update is False:
-                        hass.components.persistent_notification.async_create(
+                        pn_create(hass,
                             "A new version of CustomIR integration is available ({}). "
                             "Call the ``customir.update_component`` service to update "
                             "the integration. \n\n **Release notes:** \n{}"
@@ -113,11 +113,11 @@ async def _update(hass, branch, do_update=False, notify_if_latest=True):
                             _LOGGER.error("Error updating %s. Please update the file manually.", file)
 
                     if has_errors:
-                        hass.components.persistent_notification.async_create(
+                        pn_create(hass,
                             "There was an error updating one or more files of CustomIR. "
                             "Please check the logs for more information.", title='CustomIR')
                     else:
-                        hass.components.persistent_notification.async_create(
+                        pn_create(hass,
                             "Successfully updated to {}. Please restart Home Assistant."
                             .format(last_version), title='CustomIR')
     except Exception:

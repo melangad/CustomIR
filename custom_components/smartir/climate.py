@@ -10,10 +10,9 @@ from homeassistant.components.climate import ClimateEntity, PLATFORM_SCHEMA
 from homeassistant.components.climate.const import (
     ClimateEntityFeature, HVACMode, HVAC_MODES, ATTR_HVAC_MODE)
 from homeassistant.const import (
-    CONF_NAME, STATE_ON, STATE_OFF, STATE_UNKNOWN, STATE_UNAVAILABLE, ATTR_TEMPERATURE,
-    PRECISION_TENTHS, PRECISION_HALVES, PRECISION_WHOLE)
+    CONF_NAME, STATE_ON, STATE_OFF, STATE_UNKNOWN, STATE_UNAVAILABLE, ATTR_TEMPERATURE)
 from homeassistant.core import Event, EventStateChangedData, callback
-from homeassistant.helpers.event import async_track_state_change, async_track_state_change_event
+from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.restore_state import RestoreEntity
 from . import COMPONENT_ABS_DIR, Helper
@@ -417,7 +416,6 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
             except Exception as e:
                 _LOGGER.exception(e)
                 
-    @callback
     async def _async_temp_sensor_changed(self, event: Event[EventStateChangedData]) -> None:
         """Handle temperature sensor changes."""
         new_state = event.data["new_state"]        
@@ -428,7 +426,6 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
         self._async_update_temp(new_state)
         self.async_write_ha_state()
 
-    @callback
     async def _async_humidity_sensor_changed(self, event: Event[EventStateChangedData]) -> None:
         """Handle humidity sensor changes."""
         new_state = event.data["new_state"]
@@ -439,7 +436,6 @@ class CustomIRClimate(ClimateEntity, RestoreEntity):
         self._async_update_humidity(new_state)
         self.async_write_ha_state()
         
-    @callback
     async def _async_power_sensor_changed(self, event: Event[EventStateChangedData]) -> None:
         entity_id = event.data["entity_id"]
         old_state = event.data["old_state"]
