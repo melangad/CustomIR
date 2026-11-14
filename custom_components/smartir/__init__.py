@@ -1,6 +1,5 @@
 import aiofiles
 import aiohttp
-import asyncio
 import binascii
 from packaging.version import Version
 import json
@@ -9,12 +8,9 @@ import os.path
 import struct
 import voluptuous as vol
 
-from aiohttp import ClientSession
-from homeassistant.const import (
-    ATTR_FRIENDLY_NAME, __version__ as current_ha_version)
+from homeassistant.const import __version__ as current_ha_version
 from homeassistant.components.persistent_notification import async_create as pn_create
 import homeassistant.helpers.config_validation as cv
-from homeassistant.helpers.typing import ConfigType
 
 _LOGGER = logging.getLogger(__name__)
 

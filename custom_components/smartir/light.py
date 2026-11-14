@@ -18,7 +18,6 @@ from homeassistant.const import (
     STATE_OFF,
     STATE_ON,
 )
-from homeassistant.core import callback
 from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -327,7 +326,7 @@ class CustomIRLight(LightEntity, RestoreEntity):
                         new_brightness == len(self._brightnesses) - 1
                         or new_brightness == 0
                     ):
-                        steps = len(self._colortemps)
+                        steps = len(self._brightnesses)
                     did_something = True
                     self._brightness = self._brightnesses[new_brightness]
                     await self.send_command(cmd, steps)
@@ -372,7 +371,7 @@ class CustomIRLight(LightEntity, RestoreEntity):
         if new_state is None:
             return
         old_state = event.data["old_state"]
-        if new_state.state == old_state.state:
+        if old_state is not None and new_state.state == old_state.state:
             return
 
         if new_state.state == STATE_ON:
