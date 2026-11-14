@@ -10,8 +10,8 @@ from homeassistant.components.fan import (
     FanEntity, FanEntityFeature,
     PLATFORM_SCHEMA, DIRECTION_REVERSE, DIRECTION_FORWARD)
 from homeassistant.const import (
-    CONF_NAME, STATE_OFF, STATE_ON, STATE_UNKNOWN)
-from homeassistant.core import Event, EventStateChangedData, callback
+    CONF_NAME, STATE_OFF, STATE_ON)
+from homeassistant.core import Event, EventStateChangedData
 from homeassistant.helpers.event import async_track_state_change_event
 import homeassistant.helpers.config_validation as cv
 from homeassistant.helpers.restore_state import RestoreEntity
@@ -284,19 +284,18 @@ class CustomIRFan(FanEntity, RestoreEntity):
 
     async def _async_power_sensor_changed(self, event: Event[EventStateChangedData]) -> None:
         """Handle power sensor changes."""
-        entity_id = event.data["entity_id"]
         old_state = event.data["old_state"]
         new_state = event.data["new_state"]
 
         if new_state is None:
             return
 
-        if new_state.state == old_state.state:
+        if old_state is not None and new_state.state == old_state.state:
             return
 
         if new_state.state == STATE_ON and self._speed == SPEED_OFF:
             self._on_by_remote = True
-            self._speed = None
+            self._speed = SPEED_OFF
             self.async_write_ha_state()
 
         if new_state.state == STATE_OFF:
